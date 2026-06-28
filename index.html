@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic to Latin Converter - Branah</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .arabic-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            font-size: 24px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            direction: rtl;
+            font-family: 'Traditional Arabic', 'Arial', sans-serif;
+        }
+
+        .arabic-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-primary {
+            background-color: #667eea;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+        }
+
+        .btn-primary:hover {
+            background-color: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .latin-output {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            font-size: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            font-family: 'Courier New', monospace;
+        }
+
+        .char-mapping {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .arabic-chars {
+            font-size: 24px;
+            color: #d32f2f;
+            margin-bottom: 5px;
+            direction: rtl;
+        }
+
+        .latin-chars {
+            font-size: 20px;
+            color: #1976d2;
+            font-family: 'Courier New', monospace;
+        }
+
+        .info-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .info-section h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .info-section p {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .category-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 15px;
+            background-color: #fff;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Arabic to Latin Converter</h1>
+            <p>Transliteración de árabe a caracteres latinos (ISO 233)</p>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Arabic (Input: العربية)</div>
+            <textarea 
+                class="arabic-input" 
+                id="arabicInput" 
+                placeholder="أدخل النص العربي هنا..."
+                dir="rtl"
+            ></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-secondary" onclick="addSpaces()">Add spaces</button>
+            <button class="btn btn-secondary" onclick="removeSpaces()">Remove spaces</button>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="btn btn-primary" onclick="convertToLatin()">Convert</button>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Latin (Output: 'al'arabiyyaṯ)</div>
+            <textarea 
+                class="latin-output" 
+                id="latinOutput" 
+                readonly
+                placeholder="La transliteración aparecerá aquí..."
+            ></textarea>
+            
+            <div class="char-mapping" id="charMapping" style="display: none;">
+                <div class="arabic-chars" id="arabicChars"></div>
+                <div class="latin-chars" id="latinChars"></div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>📚 About This Tool</h3>
+            <p>
+                Arabic to Latin Converter enables you to easily convert Arabic to Latin characters. 
+                The Latin output is the phonetic reading of the Arabic input text based on the ISO 233 standard.
+            </p>
+            <p>
+                ISO 233 establishes a system for romanization of Arabic script, designed to be comprehensive 
+                and reversible for consistent cataloging, indexing, and data exchange.
+            </p>
+            <span class="category-tag">📖 Books & Literature</span>
+        </div>
+    </div>
+
+    <script>
+        // ISO 233 Arabic to Latin character mapping
+        const arabicToLatin = {
+            // Letters
+            'ا': 'a',
+            'ب': 'b',
+            'ت': 't',
+            'ث': 'ṯ',
+            'ج': 'ǧ',
+            'ح': 'ḥ',
+            'خ': 'ḫ',
+            'د': 'd',
+            'ذ': 'ḏ',
+            'ر': 'r',
+            'ز': 'z',
+            'س': 's',
+            'ش': 'š',
+            'ص': 'ṣ',
+            'ض': 'ḍ',
+            'ط': 'ṭ',
+            'ظ': 'ẓ',
+            'ع': 'ʿ',
+            'غ': 'ġ',
+            'ف': 'f',
+            'ق': 'q',
+            'ك': 'k',
+            'ل': 'l',
+            'م': 'm',
+            'ن': 'n',
+            'ه': 'h',
+            'و': 'w',
+            'ي': 'y',
+            'ة': 'ṯ',
+            'ء': "'",
+            'آ': 'ā',
+            'أ': 'a',
+            'إ': 'i',
+            'ؤ': 'u',
+            'ئ': 'i',
+            'ى': 'á',
+            'ـ': '',
+            
+            // Diacritics
+            'َ': 'a',
+            'ِ': 'i',
+            'ُ': 'u',
+            'ْ': '',
+            'ّ': '',
+            'ً': 'an',
+            'ٍ': 'in',
+            'ٌ': 'un',
+            
+            // Numbers
+            '٠': '0',
+            '١': '1',
+            '٢': '2',
+            '٣': '3',
+            '٤': '4',
+            '٥': '5',
+            '٦': '6',
+            '٧': '7',
+            '٨': '8',
+            '٩': '9',
+            
+            // Punctuation
+            '،': ',',
+            '؟': '?',
+            '؛': ';',
+            '«': '"',
+            '»': '"',
+        };
+
+        function convertToLatin() {
+            const arabicText = document.getElementById('arabicInput').value;
+            let latinText = '';
+            let mappingArabic = '';
+            let mappingLatin = '';
+
+            for (let i = 0; i < arabicText.length; i++) {
+                const char = arabicText[i];
+                if (arabicToLatin[char]) {
+                    latinText += arabicToLatin[char];
+                    if (char.trim()) {
+                        mappingArabic += char + ' ';
+                        mappingLatin += arabicToLatin[char] + ' ';
+                    }
+                } else if (char === ' ') {
+                    latinText += ' ';
+                } else {
+                    latinText += char;
+                }
+            }
+
+            document.getElementById('latinOutput').value = latinText;
+            
+            // Show character mapping
+            if (mappingArabic.trim()) {
+                document.getElementById('arabicChars').textContent = mappingArabic.trim();
+                document.getElementById('latinChars').textContent = mappingLatin.trim();
+                document.getElementById('charMapping').style.display = 'block';
+            }
+        }
+
+        function addSpaces() {
+            const input = document.getElementById('arabicInput');
+            let text = input.value;
+            // Add space after each character
+            text = text.split('').join(' ');
+            input.value = text;
+        }
+
+        function removeSpaces() {
+            const input = document.getElementById('arabicInput');
+            let text = input.value;
+            // Remove all spaces
+            text = text.replace(/\s+/g, '');
+            input.value = text;
+        }
+
+        // Auto-convert on input (optional)
+        document.getElementById('arabicInput').addEventListener('input', function() {
+            // Uncomment the next line for auto-conversion
+            // convertToLatin();
+        });
+
+        // Example usage
+        window.onload = function() {
+            // You can set a default example here
+            // document.getElementById('arabicInput').value = 'العربية';
+            // convertToLatin();
+        };
+    </script>
+</body>
+</html>
